@@ -1,5 +1,7 @@
 # transcriptor-yt
 
+[![Licença MIT](https://img.shields.io/github/license/edmaker89/transcriptor-yt)](LICENSE) ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue?logo=python&logoColor=white) ![Plataformas](https://img.shields.io/badge/plataforma-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey) [![Último commit](https://img.shields.io/github/last-commit/edmaker89/transcriptor-yt)](https://github.com/edmaker89/transcriptor-yt/commits/main) [![Estrelas](https://img.shields.io/github/stars/edmaker89/transcriptor-yt?style=social)](https://github.com/edmaker89/transcriptor-yt)
+
 Skill para agentes de código (OpenCode, Claude Code e similares) que transcreve um
 vídeo do YouTube e organiza o resultado numa nota em markdown.
 
