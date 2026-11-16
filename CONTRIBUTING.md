@@ -6,7 +6,7 @@ Obrigado pelo interesse. Antes de começar, leia o `SKILL.md` e o
 ## Ambiente de desenvolvimento
 
 ```bash
-git clone <url-do-repositorio> ~/dev/transcriptor-yt
+git clone https://github.com/edmaker89/transcriptor-yt ~/dev/transcriptor-yt
 cd ~/dev/transcriptor-yt
 python3 -m py_compile scripts/*.py install.py   # confere a sintaxe
 python3 scripts/transcribe_video.py --verificar  # confere o ambiente

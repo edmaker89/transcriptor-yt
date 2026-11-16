@@ -2,7 +2,10 @@
 """Instala a skill transcriptor-yt no diretório de skills do agente.
 
 Uso:
-    python3 install.py [--destino DIR]
+    python3 install.py                      # instala a skill e confere as dependências
+    python3 install.py --instalar-deps      # também instala yt-dlp e ffmpeg (pede confirmação)
+    python3 install.py --instalar-deps --sim  # igual, sem perguntar (para o agente, depois do aval)
+    python3 install.py --destino DIR        # outro diretório de skills
 
 Padrão de destino: ~/.config/opencode/skills. Em Mac e Linux cria um link
 simbólico, para que atualizações com `git pull` valham na hora. No Windows,
@@ -21,19 +24,19 @@ import sys
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 NOME = "transcriptor-yt"
 
-DICAS = {
+COMANDOS = {
     "Darwin": {
-        "yt-dlp": "brew install yt-dlp",
-        "ffmpeg": "brew install ffmpeg",
+        "yt-dlp": ["brew", "install", "yt-dlp"],
+        "ffmpeg": ["brew", "install", "ffmpeg"],
     },
     "Windows": {
-        "yt-dlp": "winget install yt-dlp.yt-dlp",
-        "ffmpeg": "winget install Gyan.FFmpeg",
+        "yt-dlp": ["winget", "install", "--id", "yt-dlp.yt-dlp", "-e"],
+        "ffmpeg": ["winget", "install", "--id", "Gyan.FFmpeg", "-e"],
     },
 }
-DICAS_PADRAO = {
-    "yt-dlp": "pip install yt-dlp (ou o gerenciador de pacotes da sua distribuição)",
-    "ffmpeg": "instale pelo gerenciador de pacotes da sua distribuição",
+DICAS_MANUAIS = {
+    "yt-dlp": "use o gerenciador de pacotes da sua distribuição (ex.: apt, dnf, pacman)",
+    "ffmpeg": "use o gerenciador de pacotes da sua distribuição (ex.: apt, dnf, pacman)",
 }
 
 
@@ -44,9 +47,35 @@ def checar_base():
             print(f"ok: {ferramenta}")
         else:
             faltando.append(ferramenta)
-            dica = DICAS.get(platform.system(), {}).get(ferramenta, DICAS_PADRAO[ferramenta])
-            print(f"falta: {ferramenta}  ->  {dica}")
+            print(f"falta: {ferramenta}")
     return faltando
+
+
+def instalar_deps(faltando, sim):
+    """Instala o que falta, pedindo confirmação. Só usa gerenciadores conhecidos."""
+    sistema = platform.system()
+    comandos = COMANDOS.get(sistema)
+    if not comandos:
+        print("instalação automática não disponível neste sistema:")
+        for f in faltando:
+            print(f"  {f}: {DICAS_MANUAIS[f]}")
+        return False
+
+    gerenciador = comandos[faltando[0]][0]
+    if not shutil.which(gerenciador):
+        print(f"{gerenciador} não está instalado. Instale-o primeiro e rode de novo.")
+        return False
+
+    for f in faltando:
+        cmd = comandos[f]
+        print(f"comando: {' '.join(cmd)}")
+        if not sim and input(f"Instalar {f} agora? [s/N] ").strip().lower() not in ("s", "sim", "y", "yes"):
+            print(f"{f}: pulado.")
+            continue
+        if os.system(" ".join(cmd)) != 0:
+            print(f"falha ao instalar {f}. Veja a mensagem acima.")
+            return False
+    return True
 
 
 def instalar_em(destino):
@@ -72,9 +101,17 @@ def main():
         raise SystemExit("precisa de Python 3.9 ou mais novo.")
     ap = argparse.ArgumentParser()
     ap.add_argument("--destino", default=os.path.expanduser("~/.config/opencode/skills"))
+    ap.add_argument("--instalar-deps", action="store_true",
+                    help="instala yt-dlp e ffmpeg se faltarem (pede confirmação)")
+    ap.add_argument("--sim", action="store_true",
+                    help="não pergunta ao instalar as dependências (use só com aval do usuário)")
     a = ap.parse_args()
 
     faltando = checar_base()
+    if faltando and a.instalar_deps:
+        instalar_deps(faltando, a.sim)
+        faltando = [f for f in faltando if not shutil.which(f)]
+
     instalar_em(a.destino)
 
     print()
@@ -83,9 +120,12 @@ def main():
         print("  recomendado neste Mac: pip install mlx-whisper  (ou: uv tool install mlx-whisper)")
     else:
         print("  pip install openai-whisper  (puxa o PyTorch: é grande e a transcrição é mais lenta)")
+
     if faltando:
         print()
-        print("Antes de usar a skill, instale: " + ", ".join(faltando))
+        print("Ainda falta instalar: " + ", ".join(faltando))
+        print("Rode com --instalar-deps, ou instale manualmente e confira com: "
+              "python3 scripts/transcribe_video.py --verificar")
         return 1
     return 0
 

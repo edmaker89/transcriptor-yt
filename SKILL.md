@@ -19,7 +19,8 @@ os blocos marcados como pendentes.
 ```mermaid
 flowchart TD
     A([URL do vídeo]) --> V["Passo 0: --verificar"]
-    V -->|falta yt-dlp ou ffmpeg| X0([Parar: instalar primeiro])
+    V -->|falta yt-dlp ou ffmpeg| X0{"Autoriza instalar?"}
+    X0 -->|sim| V
     V --> B["Passo 1: legenda manual ou automática"]
     B -->|ok| D["Passo 4: preencher blocos"]
     B -->|sem legenda| W{"Passo 2: autorizar Whisper?"}
@@ -39,8 +40,21 @@ python3 <skill>/scripts/transcribe_video.py --verificar
 ```
 
 A saída é JSON. `yt-dlp` e `ffmpeg` são obrigatórios para qualquer vídeo. Se um
-dos dois faltar, pare e diga ao usuário como instalar (o `install.py` mostra as
-dicas por sistema). Não siga em frente sem eles.
+dos dois faltar, não siga em frente sem eles. Pergunte ao usuário se quer
+instalar, e diga o comando que vai rodar:
+
+> Para transcrever, preciso de `yt-dlp` e `ffmpeg` no PATH, e eles não estão
+> instalados. Posso instalar agora com `<comando>`? Autoriza?
+
+Só rode depois do "sim", e use o instalador, que cuida do sistema:
+
+```bash
+python3 <skill>/install.py --instalar-deps --sim
+```
+
+Se o sistema não tiver gerenciador automático (Linux) ou ele não estiver
+instalado (Homebrew no Mac, winget no Windows), diga ao usuário o que falta e
+pare. Depois da instalação, rode `--verificar` de novo.
 
 O Whisper não é obrigatório. Ele só entra no passo 2, quando a legenda não existe.
 

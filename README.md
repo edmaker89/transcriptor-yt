@@ -38,11 +38,37 @@ Instalação das dependências básicas:
 
 ## Instalação
 
+### Pelo agente (o mais fácil)
+
+Cole este prompt no seu agente (OpenCode, Claude Code ou outro):
+
+```text
+Instale a skill transcriptor-yt a partir de https://github.com/edmaker89/transcriptor-yt.
+1. Clone o repositório em ~/dev/transcriptor-yt.
+2. Rode: python3 install.py (se você não for o OpenCode, use --destino com a pasta de skills do seu agente)
+3. Se o install.py avisar que yt-dlp ou ffmpeg faltam, me pergunte antes de
+   instalar. Só depois da minha confirmação, rode: python3 install.py --instalar-deps --sim
+4. Rode: python3 scripts/transcribe_video.py --verificar e me mostre o resultado.
+Não instale o Whisper agora: ele só é instalado se eu pedir, quando um vídeo não tiver legenda.
+```
+
+### Manualmente
+
 ```bash
-git clone <url-do-repositorio> ~/dev/transcriptor-yt
+git clone https://github.com/edmaker89/transcriptor-yt ~/dev/transcriptor-yt
 cd ~/dev/transcriptor-yt
 python3 install.py
 ```
+
+Se faltarem `yt-dlp` ou `ffmpeg`, o `install.py` diz quais. Para instalar com
+confirmação:
+
+```bash
+python3 install.py --instalar-deps
+```
+
+No Mac, isso usa o Homebrew. No Windows, usa o winget. No Linux, use o gerenciador
+da sua distribuição.
 
 Por padrão, o `install.py` cria um link em `~/.config/opencode/skills/`. Para
 outro agente, passe o destino:
