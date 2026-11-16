@@ -63,36 +63,39 @@ tente flags alternativas nem repetições em loop.
 
 ## Passo 2: pedir autorização para o Whisper
 
-Quando o script disser `PRECISA_WHISPER`, avise o usuário antes de qualquer
-download. Se já houver um Whisper instalado (`--verificar` mostra `true`):
+Quando o script disser `PRECISA_WHISPER`, use a mensagem que casa com o que o
+`--verificar` mostrou. Não instale nada antes da resposta.
 
-> Esse vídeo não tem legenda manual nem automática em `<idioma>`. Posso
-> transcrever o áudio localmente com `<ferramenta instalada>`. Isso é mais lento e
-> baixa um modelo de cerca de 1,6 GB na primeira vez. Quer seguir?
+**A) Já existe Whisper instalado** (`mlx_whisper` ou `openai-whisper` = `true`).
+Avise que o fallback do Whisper vai ser usado e peça autorização. Não há escolha:
 
-Só siga com "sim". Se o usuário disser não, encerre e explique que a nota não foi
-gerada. Se nenhum Whisper estiver instalado, use a pergunta do próximo trecho.
+> Esse vídeo não tem legenda manual nem automática em `<idioma>`. Vou usar o
+> Whisper como fallback, com `<ferramenta instalada>`. É mais lento e pode baixar
+> um modelo de cerca de 1,6 GB, se ainda não estiver no cache. Autoriza?
 
-Se o `--verificar` mostrar que nenhum Whisper está instalado, faça **uma única
-pergunta** que cubra tudo, sem instalar nada antes da resposta:
+**B) Mac com Apple Silicon, sem Whisper instalado.** Ofereça as duas opções, com
+recomendação para o `mlx_whisper`:
 
 > Esse vídeo não tem legenda. Para transcrever, preciso de um Whisper, que ainda
 > não está instalado. Posso instalar e usar um dos dois:
 >
-> - **mlx_whisper** (recomendado neste Mac): `pip install mlx-whisper`. Usa a GPU
->   do Apple Silicon e é mais rápido.
-> - **openai-whisper**: `pip install openai-whisper`. Puxa o PyTorch, que é grande
->   (vários GB), e a transcrição tende a ser mais lenta.
+> - **mlx_whisper** (recomendado neste Mac): usa a GPU do Apple Silicon e é mais rápido.
+> - **openai-whisper**: puxa o PyTorch, que é grande (vários GB), e a transcrição tende a ser mais lenta.
 >
 > Qual você quer? Também vou baixar o modelo (cerca de 1,6 GB). Autoriza?
 
-Recomende a ferramenta do sistema: `mlx_whisper` no Mac com Apple Silicon,
-`openai-whisper` nos demais. Se o `--verificar` mostrar que a ferramenta
-escolhida já está instalada, não é preciso instalar de novo. Se o usuário
-recusar, pare e explique que a nota não foi gerada.
+**C) Windows, Linux ou Mac sem Apple Silicon, sem Whisper instalado.** O
+`mlx_whisper` não roda aqui, então só existe a opção do `openai-whisper`:
 
-Só depois do "sim" e da escolha você instala o pacote escolhido com o comando
-exato da pergunta, e então segue para a fase A ou B abaixo.
+> Esse vídeo não tem legenda. Para transcrever, preciso de um Whisper, que ainda
+> não está instalado. Vou instalar o openai-whisper: ele puxa o PyTorch, que é
+> grande (vários GB), e a transcrição tende a ser bem mais lenta que no Mac com
+> Apple Silicon. O modelo também tem cerca de 1,6 GB. Autoriza?
+
+Se o usuário recusar em qualquer um dos casos, pare e explique que a nota não foi
+gerada. Só depois do "sim" instale o pacote com o comando exato: `pip install
+mlx-whisper` ou `pip install openai-whisper` (ou `uv tool install mlx-whisper`, se
+preferir isolar o ambiente). Depois siga para a fase A ou B abaixo.
 
 ## Passo 3: preparar o modelo e transcrever, em background
 
