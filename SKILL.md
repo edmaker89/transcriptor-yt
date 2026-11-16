@@ -64,26 +64,35 @@ tente flags alternativas nem repetições em loop.
 ## Passo 2: pedir autorização para o Whisper
 
 Quando o script disser `PRECISA_WHISPER`, avise o usuário antes de qualquer
-download:
+download. Se já houver um Whisper instalado (`--verificar` mostra `true`):
 
 > Esse vídeo não tem legenda manual nem automática em `<idioma>`. Posso
-> transcrever o áudio localmente com Whisper. Isso é mais lento e baixa um modelo
-> de cerca de 1,6 GB na primeira vez. Quer seguir?
+> transcrever o áudio localmente com `<ferramenta instalada>`. Isso é mais lento e
+> baixa um modelo de cerca de 1,6 GB na primeira vez. Quer seguir?
 
 Só siga com "sim". Se o usuário disser não, encerre e explique que a nota não foi
-gerada.
+gerada. Se nenhum Whisper estiver instalado, use a pergunta do próximo trecho.
 
-Se o `--verificar` mostrar que não há Whisper instalado, a pergunta precisa de
-mais duas coisas:
+Se o `--verificar` mostrar que nenhum Whisper está instalado, faça **uma única
+pergunta** que cubra tudo, sem instalar nada antes da resposta:
 
-- **Qual ferramenta instalar.** No Mac com Apple Silicon, recomende `mlx_whisper`
-  (`pip install mlx-whisper` ou `uv tool install mlx-whisper`). Em Windows e
-  Linux, `openai-whisper` (`pip install openai-whisper`). Avise que ele puxa o
-  PyTorch, que é grande, e que a transcrição tende a ser mais lenta.
-- **Autorização para instalar.** Mostre o comando exato e espere o "sim".
+> Esse vídeo não tem legenda. Para transcrever, preciso de um Whisper, que ainda
+> não está instalado. Posso instalar e usar um dos dois:
+>
+> - **mlx_whisper** (recomendado neste Mac): `pip install mlx-whisper`. Usa a GPU
+>   do Apple Silicon e é mais rápido.
+> - **openai-whisper**: `pip install openai-whisper`. Puxa o PyTorch, que é grande
+>   (vários GB), e a transcrição tende a ser mais lenta.
+>
+> Qual você quer? Também vou baixar o modelo (cerca de 1,6 GB). Autoriza?
 
-Instale só depois dessa resposta. Se o usuário escolher a ferramenta, use a
-escolhida. Se não escolher, use a recomendada para o sistema.
+Recomende a ferramenta do sistema: `mlx_whisper` no Mac com Apple Silicon,
+`openai-whisper` nos demais. Se o `--verificar` mostrar que a ferramenta
+escolhida já está instalada, não é preciso instalar de novo. Se o usuário
+recusar, pare e explique que a nota não foi gerada.
+
+Só depois do "sim" e da escolha você instala o pacote escolhido com o comando
+exato da pergunta, e então segue para a fase A ou B abaixo.
 
 ## Passo 3: preparar o modelo e transcrever, em background
 

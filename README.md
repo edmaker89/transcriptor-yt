@@ -114,4 +114,4 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licença
 
-Ainda não definida.
+MIT. Veja [LICENSE](LICENSE).
